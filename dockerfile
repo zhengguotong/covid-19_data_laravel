@@ -1,0 +1,32 @@
+FROM php:7.3-apache
+
+RUN a2enmod rewrite
+
+RUN apt-get update  && apt-get upgrade -y 
+
+# Install php extensions
+RUN \
+    docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
+    && docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
+    && docker-php-ext-install pdo_mysql 
+
+# Install composer
+ENV COMPOSER_HOME /composer
+ENV PATH ./vendor/bin:/composer/vendor/bin:$PATH
+ENV COMPOSER_ALLOW_SUPERUSER 1
+RUN curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer
+
+
+# Install composer
+# RUN cd /var/www/html \
+# composer install --optimize-autoloader --no-dev 
+# RUN cd /var/www/html \
+#    php artisan config:cache 
+# RUN cd /var/www/html \
+#     php artisan route:cache 
+# RUN  cd /var/www/html \
+#     php artisan key:generate 
+# RUN cd /var/www/html \
+#     php artisan migrate 
+
+EXPOSE 80
