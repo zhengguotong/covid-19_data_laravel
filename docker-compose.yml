@@ -4,7 +4,7 @@ services:
         build:
             context : .
             dockerfile: dockerfile
-        container_name: lumen
+        container_name: covid_19_data_laravel
         depends_on:
             - db
         volumes:
