@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use  App\Exceptions\ModelNotDefinedException;
 
 class Handler extends ExceptionHandler
 {
@@ -50,6 +51,11 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        if ($exception instanceof ModelNotDefinedException && $request->expectsJson()) {
+            return response()->json(['error' => [
+                'message' => 'No model define'
+            ]], 500);
+        }
         return parent::render($request, $exception);
     }
 }
