@@ -2,13 +2,17 @@ FROM php:7.3-apache
 
 RUN a2enmod rewrite
 
-RUN apt-get update  && apt-get upgrade -y 
+RUN apt-get update  && apt-get upgrade -y \
+    zlib1g-dev \
+    libzip-dev \
+    unzip
 
 # Install php extensions
 RUN \
     docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
     && docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
-    && docker-php-ext-install pdo_mysql 
+    && docker-php-ext-install pdo_mysql \
+    && docker-php-ext-install zip 
 
 # Install composer
 ENV COMPOSER_HOME /composer
