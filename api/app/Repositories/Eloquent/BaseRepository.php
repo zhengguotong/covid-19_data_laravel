@@ -28,17 +28,24 @@ abstract class BaseRepository implements IBase
 
     public function create(array $data)
     {
-
+        return $this->model->create($data);
     }
 
     public function update($id,array $data)
-    {
-
+    {   
+        $record = $this->find($id);
+        return $record->update($data);
     }
 
     public function delete($id)
     {
+        $record = $this->find($id);
+        return $record->delete($id);
+    }
 
+    public function updateOrCreate(array $condition, array $data)
+    {
+        $this->model->updateOrCreate($condition,$data);
     }
     
     protected function getModelClass()

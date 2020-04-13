@@ -5,11 +5,11 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Contracts\{
     IBase,
-    IReportCase
+    IReportedCase
 };
 use App\Repositories\Eloquent\{
     BaseRepository,
-    ReportCaseRepository
+    ReportedCaseRepository
 };
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -31,6 +31,6 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->app->bind(IReportCase::class, ReportCaseRepository::class);
+        $this->app->bind(IReportedCase::class, ReportedCaseRepository::class);
     }
 }

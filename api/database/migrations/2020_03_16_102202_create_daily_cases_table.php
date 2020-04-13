@@ -16,12 +16,12 @@ class CreateDailyCasesTable extends Migration
         Schema::create('daily_cases', function (Blueprint $table) {
             $table->id();
             $table->string('province');
-            $table->string('state');
             $table->string('region');
             $table->dateTime('last_update');
             $table->integer('confirmed');
             $table->integer('deaths');
             $table->integer('recovered');
+            $table->date('report_date');
             $table->softDeletes();
             $table->timestamps();
         });

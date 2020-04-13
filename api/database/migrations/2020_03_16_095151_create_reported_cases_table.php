@@ -16,7 +16,6 @@ class CreateReportedCasesTable extends Migration
         Schema::create('reported_cases', function (Blueprint $table) {
             $table->id();
             $table->string('province');
-            $table->string('state');
             $table->string('region');
             $table->dateTime('last_update');
             $table->integer('confirmed');
@@ -24,6 +23,7 @@ class CreateReportedCasesTable extends Migration
             $table->integer('recovered');
             $table->double('longitude');
             $table->double('latitude');
+            $table->date('report_date');
             $table->softDeletes();
             $table->timestamps();
         });
