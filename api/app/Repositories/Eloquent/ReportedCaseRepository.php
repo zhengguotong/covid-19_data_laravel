@@ -13,7 +13,7 @@ class ReportedCaseRepository extends BaseRepository implements IReportedCase
         return ReportedCase::class;
     }
 
-    public function getFilable()
+    public function getFilable($has_admin_field = false)
     {
         return $this->model->getFillable();
     }

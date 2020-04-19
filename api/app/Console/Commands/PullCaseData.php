@@ -24,7 +24,7 @@ class PullCaseData extends Command
     protected $description = 'Command to pull data from github repo';
 
     protected $report_case;
-    protected $date_format_changed_date;
+    protected $colums_changed_date;
     /**
      * Create a new command instance.
      *
@@ -34,7 +34,7 @@ class PullCaseData extends Command
     {
         parent::__construct();
         $this->report_case = $report_case;
-        $this->date_format_changed_date = Carbon::createFromFormat('m-d-Y', Config::get('covid19.date_format_changed_date'));
+        $this->colums_changed_date = Carbon::createFromFormat('m-d-Y', Config::get('covid19.colums_changed_date'));
     }
 
     /**
@@ -56,9 +56,9 @@ class PullCaseData extends Command
             $end = Carbon::today()->format('m-d-Y');
         }
 
-        $currentDate = Carbon::createFromFormat('m-d-Y',$start);
-        while($currentDate->format('m-d-Y') !== $end ){
-            $this->info('Start Sync ' . $currentDate->format('m-d-Y') .' reported case data.');
+        $currentDate = Carbon::createFromFormat('m-d-Y', $start);
+        while ($currentDate->format('m-d-Y') !== $end) {
+            $this->info('Start Sync ' . $currentDate->format('m-d-Y') . ' reported case data.');
             $this->parseCaseCsv($currentDate);
             $currentDate = $currentDate->addDay();
         }
@@ -70,43 +70,69 @@ class PullCaseData extends Command
         $file = file_get_contents($file_path);
         if ($file !== FALSE) {
             $rows = explode("\n", $file);
-            $headers = $this->report_case->getFilable();
+            $has_admin_field = $currentDate->gt($this->colums_changed_date);
+            $headers  = $this->getHeader($has_admin_field);
             for ($i = 1; $i < count($rows); $i++) {
                 $tmp = str_getcsv($rows[$i]);
                 $row = $this->report_case->getDefaultFields();
                 $row['report_date'] = $currentDate->format('Y-m-d');
-
                 for ($k = 0; $k < count($tmp); $k++) {
-                    if(!empty($tmp[$k])){
+                    if (!empty($tmp[$k])) {
                         $row[$headers[$k]] = $tmp[$k];
                     }
                 }
 
-                if(!empty($row['region'])){
+                if (!empty($row['region'])) {
                     $condition = array(
                         'report_date' => $row['report_date'],
                         'province' => $row['province'],
                         'region' => $row['region']
                     );
-                    $row['last_update'] = $this->parseDataTime($row['last_update'],$currentDate);
+                    if ($has_admin_field) {
+                        $condition['admin2'] = $row['admin2'];
+                    }
+                    $row['last_update'] = $this->parseDataTime($row['last_update']);
                     $this->report_case->updateOrCreate($condition, $row);
                 }
-              
             }
         }
     }
 
-    private function  parseDataTime($date,$currentDate)
+    private function  parseDataTime($date)
     {
-        if($date){
-            $dateFormat = 'm/d/Y H:i';
-            if($currentDate->gt($this->date_format_changed_date)){
-                return date('Y-m-d H:i:s', strtotime($date));
-            }else{
-                return  Carbon::createFromFormat($dateFormat , $date)->format('Y-m-d H:i:s');
-            }
-          
+        return $date ? date('Y-m-d H:i:s', strtotime($date)) : '';
+    }
+
+    private function getHeader($has_admin_field)
+    {
+        if ($has_admin_field) {
+            return  [
+                'FIPS',
+                'admin2',
+                'province',
+                'region',
+                'last_update',
+                'longitude',
+                'latitude',
+                'confirmed',
+                'deaths',
+                'recovered',
+                'active',
+                'combined_key',
+                'report_date',
+            ];
+        } else {
+            return  [
+                'province',
+                'region',
+                'last_update',
+                'confirmed',
+                'deaths',
+                'recovered',
+                'longitude',
+                'latitude',
+                'report_date',
+            ];
         }
-        return '';
     }
 }
