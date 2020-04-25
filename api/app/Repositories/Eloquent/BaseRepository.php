@@ -4,9 +4,11 @@ namespace App\Repositories\Eloquent;
 
 use App\Exceptions\ModelNotDefinedException;
 use App\Repositories\Contracts\IBase;
+use App\Repositories\Criteria\ICriteria;
 use Exception;
+use Illuminate\Support\Arr;
 
-abstract class BaseRepository implements IBase
+abstract class BaseRepository implements IBase, ICriteria
 {
     protected $model;
 
@@ -46,6 +48,15 @@ abstract class BaseRepository implements IBase
     public function updateOrCreate(array $condition, array $data)
     {
         $this->model->updateOrCreate($condition,$data);
+    }
+
+    public function withCriteria(...$criteria)
+    {
+        $criteria = Arr::flatten($criteria);
+        foreach($criteria as $criterion){
+            $this->model = $criterion->apply($this->model);
+        }
+        return $this;
     }
     
     protected function getModelClass()
