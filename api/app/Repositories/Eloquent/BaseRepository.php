@@ -5,7 +5,6 @@ namespace App\Repositories\Eloquent;
 use App\Exceptions\ModelNotDefinedException;
 use App\Repositories\Contracts\IBase;
 use App\Repositories\Criteria\ICriteria;
-use Exception;
 use Illuminate\Support\Arr;
 
 abstract class BaseRepository implements IBase, ICriteria
@@ -19,7 +18,12 @@ abstract class BaseRepository implements IBase, ICriteria
 
     public function all()
     {
-        return $this->model::all();
+        return $this->model->get();
+    }
+
+    public function first()
+    {
+        return $this->model->first();
     }
 
     public function find($id)

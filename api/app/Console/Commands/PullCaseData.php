@@ -2,10 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\UpdateDailyCase;
 use Illuminate\Console\Command;
 use Config;
 use Carbon\Carbon;
 use App\Repositories\Contracts\IReportedCase;
+use App\Repositories\Eloquent\Criteria\ReportDate;
 
 class PullCaseData extends Command
 {
@@ -14,7 +16,7 @@ class PullCaseData extends Command
      *
      * @var string
      */
-    protected $signature = 'pull_case_data:pull {start?} {end?} {--flush}';
+    protected $signature = 'pull_case_data:pull {action=pull} {start?} {end?}  {--flush}';
 
     /**
      * The console command description.
@@ -23,18 +25,18 @@ class PullCaseData extends Command
      */
     protected $description = 'Command to pull data from github repo';
 
-    protected $report_case;
-    protected $colums_changed_date;
+    protected $reportCase;
+    protected $columsChangedDate;
     /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct(IReportedCase $report_case)
+    public function __construct(IReportedCase $reportCase)
     {
         parent::__construct();
-        $this->report_case = $report_case;
-        $this->colums_changed_date = Carbon::createFromFormat('m-d-Y', Config::get('covid19.colums_changed_date'));
+        $this->reportCase = $reportCase;
+        $this->columsChangedDate = Carbon::createFromFormat('m-d-Y', Config::get('covid19.colums_changed_date'));
     }
 
     /**
@@ -44,6 +46,7 @@ class PullCaseData extends Command
      */
     public function handle()
     {
+        $action = $this->argument('action');
         $start = $this->argument('start');
         $end = $this->argument('end');
         $flush = $this->option('flush');
@@ -57,6 +60,38 @@ class PullCaseData extends Command
         }
 
         $currentDate = Carbon::createFromFormat('m-d-Y', $start);
+        switch ($action) {
+            case 'dispatch':
+                $this->dispatchJobs($end, $currentDate);
+                break;
+            default:
+                $this->pullCaseData($end, $currentDate);
+                break;
+        }
+    }
+
+    protected function dispatchJobs($end, $currentDate)
+    {
+        while ($currentDate->format('m-d-Y') !== $end) {
+            $this->info('Dispatch ' . $currentDate->format('Y-m-d')  . ' update daily case data job.');
+            $cases = $this->reportCase->withCriteria([
+                new ReportDate($currentDate->format('Y-m-d'))
+            ])->all();
+
+            if ($cases && count($cases) > 0) {
+                foreach ($cases as $case) {
+                    UpdateDailyCase::dispatch($case);
+                }
+            }
+            $this->info('Total ' . count($cases) . ' jobs Dispatch');
+            $cases = null;
+            $currentDate = $currentDate->addDay();
+        }
+    }
+
+    protected function pullCaseData($end,  $currentDate)
+    {
+
         while ($currentDate->format('m-d-Y') !== $end) {
             $this->info('Start Sync ' . $currentDate->format('m-d-Y') . ' reported case data.');
             $this->parseCaseCsv($currentDate);
@@ -70,11 +105,11 @@ class PullCaseData extends Command
         $file = file_get_contents($file_path);
         if ($file !== FALSE) {
             $rows = explode("\n", $file);
-            $has_admin_field = $currentDate->gt($this->colums_changed_date);
+            $has_admin_field = $currentDate->gt($this->columsChangedDate);
             $headers  = $this->getHeader($has_admin_field);
             for ($i = 1; $i < count($rows); $i++) {
                 $tmp = str_getcsv($rows[$i]);
-                $row = $this->report_case->getDefaultFields();
+                $row = $this->reportCase->getDefaultFields();
                 $row['report_date'] = $currentDate->format('Y-m-d');
                 for ($k = 0; $k < count($tmp); $k++) {
                     if (!empty($tmp[$k])) {
@@ -92,7 +127,7 @@ class PullCaseData extends Command
                         $condition['admin2'] = $row['admin2'];
                     }
                     $row['last_update'] = $this->parseDataTime($row['last_update']);
-                    $this->report_case->updateOrCreate($condition, $row);
+                    $this->reportCase->updateOrCreate($condition, $row);
                 }
             }
         }

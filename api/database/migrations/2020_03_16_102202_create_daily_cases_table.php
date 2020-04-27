@@ -17,7 +17,6 @@ class CreateDailyCasesTable extends Migration
             $table->id();
             $table->string('province');
             $table->string('region');
-            $table->dateTime('last_update');
             $table->integer('confirmed');
             $table->integer('deaths');
             $table->integer('recovered');
