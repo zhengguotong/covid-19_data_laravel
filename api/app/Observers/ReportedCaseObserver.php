@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Jobs\UpdateDailyCase;
 use App\ReportedCase;
 
 class ReportedCaseObserver
@@ -14,7 +15,7 @@ class ReportedCaseObserver
      */
     public function created(ReportedCase $reportedCase)
     {
-        //
+        UpdateDailyCase::dispatch($reportedCase);
     }
 
     /**
@@ -25,7 +26,9 @@ class ReportedCaseObserver
      */
     public function updated(ReportedCase $reportedCase)
     {
-        //
+        if($reportedCase->isDirty(['confirmed', 'deaths', 'recovered', 'active'])){
+            UpdateDailyCase::dispatch($reportedCase);
+        }
     }
 
     /**
