@@ -59,6 +59,7 @@ class PullCaseData extends Command
             $end = Carbon::today()->format('m-d-Y');
         }
 
+        $end =  Carbon::createFromFormat('m-d-Y', $end);
         $currentDate = Carbon::createFromFormat('m-d-Y', $start);
         switch ($action) {
             case 'dispatch':
@@ -72,15 +73,17 @@ class PullCaseData extends Command
 
     protected function dispatchJobs($end, $currentDate)
     {
-        while ($currentDate->format('m-d-Y') !== $end) {
-            $this->info('Dispatch ' . $currentDate->format('Y-m-d')  . ' update daily case data job.');
-            $cases = $this->reportCase->withCriteria([
+        while ($currentDate->lessThanOrEqualTo($end)) {
+            $reportCase = resolve('App\Repositories\Contracts\IReportedCase');
+            $date = $currentDate->format('Y-m-d');
+            $this->info('Dispatch ' .  $date   . ' update daily case data job.');
+            $cases = $reportCase->withCriteria([
                 new ReportDate($currentDate->format('Y-m-d'))
             ])->all();
 
             if ($cases && count($cases) > 0) {
                 foreach ($cases as $case) {
-                    UpdateDailyCase::dispatch($case);
+                    UpdateDailyCase::dispatch($case)->onConnection('database')->delay(60);
                 }
             }
             $this->info('Total ' . count($cases) . ' jobs Dispatch');
@@ -91,8 +94,7 @@ class PullCaseData extends Command
 
     protected function pullCaseData($end,  $currentDate)
     {
-
-        while ($currentDate->format('m-d-Y') !== $end) {
+        while ($currentDate->lessThan($end)) {
             $this->info('Start Sync ' . $currentDate->format('m-d-Y') . ' reported case data.');
             $this->parseCaseCsv($currentDate);
             $currentDate = $currentDate->addDay();
