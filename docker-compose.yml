@@ -2,11 +2,11 @@ version: '3.4'
 services:
     api:
         build:
-            context : .
-            dockerfile: dockerfile
+            context : ./.docker/api
         container_name: covid_19_data_laravel
         depends_on:
             - db
+            - redis
         volumes:
             - ./api:/var/www/html
         env_file: './api/.env'
@@ -32,3 +32,10 @@ services:
             MYSQL_PASSWORD: devpass
         ports: 
             - 6038:3306
+    redis: 
+        container_name: covid_19_data_laravel_redis
+        build:
+          context: ./.docker/redis
+        expose:
+          - 6379
+        
