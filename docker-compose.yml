@@ -12,7 +12,7 @@ services:
         env_file: './api/.env'
         environment:
               - "DB_HOST=database"
-              - "REDIS_HOST=cache"
+              - "REDIS_HOST=redis"
               - "DB_HOST=db"
               - "DB_PORT=3306"
               - "DB_DATABASE=covid19_data"

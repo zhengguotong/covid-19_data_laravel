@@ -83,7 +83,7 @@ class PullCaseData extends Command
 
             if ($cases && count($cases) > 0) {
                 foreach ($cases as $case) {
-                    UpdateDailyCase::dispatch($case)->onConnection('database')->delay(60);
+                    UpdateDailyCase::dispatch($case);
                 }
             }
             $this->info('Total ' . count($cases) . ' jobs Dispatch');
