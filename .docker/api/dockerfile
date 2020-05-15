@@ -34,4 +34,16 @@ RUN curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/
 # RUN cd /var/www/html \
 #     php artisan migrate 
 
+#cron
+RUN apt-get -y install cron
+COPY ./cron /etc/cron.d/cron
+RUN chmod 0644 /etc/cron.d/cron
+RUN crontab /etc/cron.d/cron
+
+#horizon & supervisor
+RUN apt-get -y install supervisor
+COPY ./horizon.conf /etc/supervisor/conf.d/horizon.conf
+RUN  service supervisor stop
+RUN  service supervisor start
+
 EXPOSE 80

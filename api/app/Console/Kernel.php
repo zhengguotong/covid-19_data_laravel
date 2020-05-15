@@ -25,6 +25,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+        $start_date = date('m-d-Y', strtotime('-1 day'));
+        $schedule->command('pull_case_data:pull pull ' . $start_date)->dailyAt('09:00')->appendOutputTo(storage_path('logs/pullcase.log'));
     }
 
     /**
