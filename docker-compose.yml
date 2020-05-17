@@ -1,23 +1,17 @@
 version: '3.4'
 services:
     api:
+        user: www
         build:
             context : ./.docker/api
-        container_name: covid_19_data_laravel
+        container_name: covid_19_data_laravel_fpm
         depends_on:
             - db
             - redis
         volumes:
             - ./api:/var/www/html
-        env_file: './api/.env'
-        environment:
-              - "DB_HOST=database"
-              - "REDIS_HOST=redis"
-              - "DB_HOST=db"
-              - "DB_PORT=3306"
-              - "DB_DATABASE=covid19_data"
-              - "DB_USERNAME=devuser"
-              - "DB_PASSWORD=devpass"
+        expose:
+            - 80
         ports:
             - 8002:80
     db:
@@ -26,10 +20,12 @@ services:
         command: --default-authentication-plugin=mysql_native_password
         restart: always
         environment: 
-            MYSQL_ROOT_PASSWORD: root
-            MYSQL_DATABASE: covid19_data
-            MYSQL_USER: devuser
-            MYSQL_PASSWORD: devpass
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        expose:
+            - 3306
         ports: 
             - 6038:3306
     redis: 

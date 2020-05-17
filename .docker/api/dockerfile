@@ -1,49 +1,62 @@
-FROM php:7.3-apache
+FROM php:7.3-fpm
 
-RUN a2enmod rewrite
+# Set working directory
+WORKDIR /var/www/html
 
-RUN apt-get update  && apt-get upgrade -y \
-    zlib1g-dev \
+# RUN a2enmod rewrite
+
+# Required for fixing an error while installing pdftk 
+RUN mkdir /usr/share/man/man1/
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl \
+    libmemcached-dev \
+    libz-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libssl-dev \
+    libmcrypt-dev \
+    less \
+    nano \
+    vim \
+    cron \
+    git \
+    unzip \
     libzip-dev \
-    unzip
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    pdftk
 
-# Install php extensions
-RUN \
-    docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
-    && docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
-    && docker-php-ext-install pdo_mysql \
-    && docker-php-ext-install zip \
-    && docker-php-ext-install  pcntl
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install composer
-ENV COMPOSER_HOME /composer
-ENV PATH ./vendor/bin:/composer/vendor/bin:$PATH
-ENV COMPOSER_ALLOW_SUPERUSER 1
-RUN curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer
+# Install extensions
+RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
+RUN docker-php-ext-install pdo_mysql \
+    pcntl \
+    zip
 
+RUN  docker-php-ext-configure gd --with-gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ \
+    && docker-php-ext-install gd
 
-# Install composer
-# RUN cd /var/www/html \
-# composer install --optimize-autoloader --no-dev 
-# RUN cd /var/www/html \
-#    php artisan config:cache 
-# RUN cd /var/www/html \
-#     php artisan route:cache 
-# RUN  cd /var/www/html \
-#     php artisan key:generate 
-# RUN cd /var/www/html \
-#     php artisan migrate 
+RUN docker-php-ext-install opcache
 
-#cron
-RUN apt-get -y install cron
+# Cron
 COPY ./cron /etc/cron.d/cron
 RUN chmod 0644 /etc/cron.d/cron
 RUN crontab /etc/cron.d/cron
 
-#horizon & supervisor
-RUN apt-get -y install supervisor
-COPY ./horizon.conf /etc/supervisor/conf.d/horizon.conf
-RUN  service supervisor stop
-RUN  service supervisor start
+# Configure opcache.ini
+COPY ./conf.d/opcache.ini /tmp
+RUN mv /tmp/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
-EXPOSE 80
+# Add www user and www group
+RUN groupadd -g 1000 www
+RUN useradd -u 1000 -ms /bin/bash -g www www
+
+# Copy existing application directory permissions
+RUN chown -R www: /var/www/html
+
+# Change current user to www
+USER www
