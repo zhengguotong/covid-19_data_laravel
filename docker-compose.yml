@@ -11,9 +11,23 @@ services:
         volumes:
             - ./api:/var/www/html
         expose:
-            - 80
+            - 9000
+    nginx:
+        restart: always
+        container_name: covid_19_data_laravel_nginx
+        working_dir: /var/www/html
+        build:
+          context: ./.docker/nginx
+          args:
+            - APP_HOST=${APP_HOST}
+        volumes:
+          - ./api:/var/www/html
+          - ./.docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+          - ./.docker/nginx/conf.d/:/etc/nginx/conf.d
         ports:
-            - 8002:80
+          - 8002:80
+        depends_on:
+          - api
     db:
         container_name: covid_19_data_laravel_db
         image: mysql:8.0

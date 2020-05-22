@@ -42,14 +42,19 @@ RUN  docker-php-ext-configure gd --with-gd --with-freetype-dir=/usr/include/ --w
 
 RUN docker-php-ext-install opcache
 
-# Cron
-COPY ./cron /etc/cron.d/cron
-RUN chmod 0644 /etc/cron.d/cron
-RUN crontab /etc/cron.d/cron
+# Configure php.ini
+RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+RUN sed -e 's/max_execution_time = 30/max_execution_time = 600/' -i "$PHP_INI_DIR/php.ini"
+RUN sed -e 's/memory_limit = 128M/memory_limit = 512M/' -i "$PHP_INI_DIR/php.ini"
 
 # Configure opcache.ini
 COPY ./conf.d/opcache.ini /tmp
 RUN mv /tmp/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+
+# Cron
+COPY ./cron /etc/cron.d/cron
+RUN chmod 0644 /etc/cron.d/cron
+RUN crontab /etc/cron.d/cron
 
 # Add www user and www group
 RUN groupadd -g 1000 www
