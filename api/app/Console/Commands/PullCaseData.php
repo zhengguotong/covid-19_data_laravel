@@ -156,6 +156,8 @@ class PullCaseData extends Command
                 'recovered',
                 'active',
                 'combined_key',
+                'Incidence_Rate',
+                'Case-Fatality_Ratio',
                 'report_date',
             ];
         } else {
