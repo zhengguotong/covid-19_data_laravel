@@ -48,4 +48,11 @@ services:
           context: ./.docker/redis
         expose:
           - 6379
+    # node:
+    #     container_name: covid_19_data_laravel_node
+    #     working_dir: /var/www/html
+    #     build:
+    #       context: ./.docker/node
+    #     volumes:
+    #       - ./api:/var/www/html
         
