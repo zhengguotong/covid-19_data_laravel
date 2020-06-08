@@ -6,6 +6,22 @@ This is a laravel project to collect data from https://github.com/CSSEGISandData
 ## Data Source 
 https://github.com/CSSEGISandData/COVID-19
 
+## Docker Configuration
+
+### .env
+Create an `.env` file from `.env.example`
+```bash
+cp .env.example .env
+
+# Customize every variable according to your needs
+# See comments to each variable in .env.example file
+```
+### Docker Containers list 
+- covid_19_data_laravel_fpm   PHP FPM container 
+- covid_19_data_laravel_nginx Nginx Container
+- covid_19_data_laravel_db DD Conatiner  
+- covid_19_data_laravel_redis Redis container
+
 ## Artisan Commands
 <b>Pull total Report Case</b><br/>
 PHP artisan  pull_case_data:pull pull start_date end_date <br/>
