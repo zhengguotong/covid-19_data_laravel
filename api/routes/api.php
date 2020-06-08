@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(['middleware' => ['auth:api']], function(){
+    Route::get('me', 'User\MeController@getMe');
+    Route::get('reported-cases', 'ReportedCaseController@index');
+    Route::get('search/reported-cases', 'ReportedCaseController@search');
 });
