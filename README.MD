@@ -19,6 +19,17 @@ This command will update daily confirmed, deaths, recovered, active data compare
 start_date and end_date in m-d-Y format.
 <br>if do not sepcify the start date, then the default start date will be 01-22-2020<br>
 
+## API Endpoint
+<b>Total Report Case</b><br/>
+###### /api/reported-cases<br/>
+Get All reported case for each country/region, province, admin2
+
+###### /api/search/reported-cases<br/>
+Search lastest reporeted by country/region, province, amdin2 <br>
+eg.
+- /api/search/reported-cases?country=US&admin2=Choctaw  Search current reported case on Choctaw US
+- /api/search/reported-cases?country=Australia&province=Queensland Search current reported case on Queesland Australia
+
 
 ## Terms of Use
 This GitHub repo and its contents herein, including all data, mapping, and analysis,  is provided to the public strictly for educational and academic research purposes.The project relies upon publicly available data from multiple sources, that do not always agree. Project owner(Zhengguotong)  hereby disclaims any and all representations and warranties with respect to the data, including accuracy, fitness for use, and merchantability.  Reliance on the Website for medical guidance or use of the Website in commerce is strictly prohibited.
