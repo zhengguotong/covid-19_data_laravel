@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ReportedCaseResource;
 use App\Repositories\Contracts\IReportedCase;
-use App\Repositories\Eloquent\Criteria\Country;
 use App\Repositories\Eloquent\Criteria\ReportDate;
-use Facade\FlareClient\Http\Response;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class ReportedCaseController extends Controller
 {
@@ -34,6 +33,12 @@ class ReportedCaseController extends Controller
         }
 
         return response()->json(null,200);
+    }
+
+    public function regionTotal(Request $request)
+    {
+       $repotedCases = $this->reportedCase->getRegionTotal($request);
+       return JsonResource::collection($repotedCases);
     }
 
     public function search(Request $request)
