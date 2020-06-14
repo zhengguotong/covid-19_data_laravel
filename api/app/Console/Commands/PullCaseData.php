@@ -104,7 +104,7 @@ class PullCaseData extends Command
     protected function parseCaseCsv($currentDate)
     {
         $file_path = Config::get('covid19.case_cvs_base_link') . $currentDate->format('m-d-Y') . '.csv';
-        $file = file_get_contents($file_path);
+        $file = @file_get_contents($file_path);
         if ($file !== FALSE) {
             $rows = explode("\n", $file);
             $has_admin_field = $currentDate->gt($this->columsChangedDate);
@@ -132,6 +132,8 @@ class PullCaseData extends Command
                     $this->reportCase->updateOrCreate($condition, $row);
                 }
             }
+        }else{
+            $this->warn($file_path . ' does not exist.');
         }
     }
 
