@@ -16,7 +16,9 @@ class UpdateDailyCase implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $reportCase, $model, $dailyCase;
+    protected $reportCase;
+    protected $model;
+    protected $dailyCase;
     /**
      * Create a new job instance.
      *
@@ -60,7 +62,7 @@ class UpdateDailyCase implements ShouldQueue
             ->format('Y-m-d');
 
         $pervious_data = $this->reportCase->withCriteria([
-            new DateLocation($pervious_date,  $this->model->region,  $this->model->province, $this->model->admin2),
+            new DateLocation($pervious_date, $this->model->region, $this->model->province, $this->model->admin2),
         ])->first();
 
 
@@ -72,7 +74,6 @@ class UpdateDailyCase implements ShouldQueue
         );
 
         if ($pervious_data) {
-           
             $pervious_data =  $pervious_data->toArray();
             foreach ($dailyData  as $key => $value) {
                 $dailyData[$key] = $value - $pervious_data[$key];

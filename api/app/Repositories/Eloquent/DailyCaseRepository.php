@@ -38,11 +38,11 @@ class DailyCaseRepository extends BaseRepository implements IDailyCase
         );
 
         if ($request->from_date) {
-            $query->where('report_date', '>=',  $request->from_date);
+            $query->where('report_date', '>=', $request->from_date);
         }
 
         if ($request->to_date) {
-            $query->where('report_date', '<=',  $request->to_date);
+            $query->where('report_date', '<=', $request->to_date);
         }
 
         //filter region
@@ -74,11 +74,11 @@ class DailyCaseRepository extends BaseRepository implements IDailyCase
         );
 
         if ($request->from_date) {
-            $query->where('report_date', '>=',  $request->from_date);
+            $query->where('report_date', '>=', $request->from_date);
         }
 
         if ($request->to_date) {
-            $query->where('report_date', '<=',  $request->to_date);
+            $query->where('report_date', '<=', $request->to_date);
         }
 
         //filter region

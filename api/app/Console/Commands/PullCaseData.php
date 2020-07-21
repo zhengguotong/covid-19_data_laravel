@@ -92,7 +92,7 @@ class PullCaseData extends Command
         }
     }
 
-    protected function pullCaseData($end,  $currentDate)
+    protected function pullCaseData($end, $currentDate)
     {
         while ($currentDate->lessThan($end)) {
             $this->info('Start Sync ' . $currentDate->format('m-d-Y') . ' reported case data.');
@@ -105,7 +105,7 @@ class PullCaseData extends Command
     {
         $file_path = Config::get('covid19.case_cvs_base_link') . $currentDate->format('m-d-Y') . '.csv';
         $file = @file_get_contents($file_path);
-        if ($file !== FALSE) {
+        if ($file !== false) {
             $rows = explode("\n", $file);
             $has_admin_field = $currentDate->gt($this->columsChangedDate);
             $headers  = $this->getHeader($has_admin_field);
@@ -132,12 +132,12 @@ class PullCaseData extends Command
                     $this->reportCase->updateOrCreate($condition, $row);
                 }
             }
-        }else{
+        } else {
             $this->warn($file_path . ' does not exist.');
         }
     }
 
-    private function  parseDataTime($date)
+    private function parseDataTime($date)
     {
         return $date ? date('Y-m-d H:i:s', strtotime($date)) : '';
     }

@@ -3,14 +3,10 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Repositories\Contracts\{
-    IReportedCase,
-    IDailyCase
-};
-use App\Repositories\Eloquent\{
-    ReportedCaseRepository,
-    DailyCaseRepository
-};
+use App\Repositories\Contracts\IReportedCase;
+use App\Repositories\Contracts\IDailyCase;
+use App\Repositories\Eloquent\ReportedCaseRepository;
+use App\Repositories\Eloquent\DailyCaseRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {

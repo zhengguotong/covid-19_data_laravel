@@ -26,7 +26,7 @@ class ReportedCaseObserver
      */
     public function updated(ReportedCase $reportedCase)
     {
-        if($reportedCase->isDirty(['confirmed', 'deaths', 'recovered', 'active'])){
+        if ($reportedCase->isDirty(['confirmed', 'deaths', 'recovered', 'active'])) {
             UpdateDailyCase::dispatch($reportedCase);
         }
     }

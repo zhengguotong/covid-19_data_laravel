@@ -8,7 +8,7 @@ class Country implements ICriterion
 {
     protected $region;
 
-    public function __construct( $region)
+    public function __construct($region)
     {
         $this->region = $region;
     }

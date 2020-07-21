@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Repositories\Eloquent;
 
@@ -34,14 +34,16 @@ class ReportedCaseRepository extends BaseRepository implements IReportedCase
     {
         $query = (new $this->model)->newQuery();
         $max_reported_date = $this->getLastestReportDate();
-        $query->select('region',
-                     DB::raw('SUM(confirmed) as total_confirmed'),
-                     DB::raw('SUM(deaths) as total_deaths'),
-                     DB::raw('SUM(recovered) as total_recovered'),
-                     DB::raw('SUM(active) as total_active'));
-        $query->where('report_date',$max_reported_date);
-         //filter region
-         if($request->country){
+        $query->select(
+            'region',
+            DB::raw('SUM(confirmed) as total_confirmed'),
+            DB::raw('SUM(deaths) as total_deaths'),
+            DB::raw('SUM(recovered) as total_recovered'),
+            DB::raw('SUM(active) as total_active')
+        );
+        $query->where('report_date', $max_reported_date);
+        //filter region
+        if ($request->country) {
             $query->where('region', $request->country);
         }
         $query->groupBy('region');
@@ -52,23 +54,23 @@ class ReportedCaseRepository extends BaseRepository implements IReportedCase
     {
         $query = (new $this->model)->newQuery();
         $max_reported_date = $this->getLastestReportDate();
-        $query->where('report_date',$max_reported_date);
+        $query->where('report_date', $max_reported_date);
         
         //filter region
-        if($request->country){
+        if ($request->country) {
             $query->where('region', $request->country);
         }
 
         //filter province
-        if($request->province){
+        if ($request->province) {
             $query->where('province', $request->province);
         }
 
         //filter admin2
-        if($request->admin2){
+        if ($request->admin2) {
             $query->where('admin2', $request->admin2);
         }
 
-        return $query->get(); 
+        return $query->get();
     }
 }

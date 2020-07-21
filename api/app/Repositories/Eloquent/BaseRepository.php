@@ -43,8 +43,8 @@ abstract class BaseRepository implements IBase, ICriteria
         return $this->model->create($data);
     }
 
-    public function update($id,array $data)
-    {   
+    public function update($id, array $data)
+    {
         $record = $this->find($id);
         return $record->update($data);
     }
@@ -57,13 +57,13 @@ abstract class BaseRepository implements IBase, ICriteria
 
     public function updateOrCreate(array $condition, array $data)
     {
-        $this->model->updateOrCreate($condition,$data);
+        $this->model->updateOrCreate($condition, $data);
     }
 
     public function withCriteria(...$criteria)
     {
         $criteria = Arr::flatten($criteria);
-        foreach($criteria as $criterion){
+        foreach ($criteria as $criterion) {
             $this->model = $criterion->apply($this->model);
         }
         return $this;
@@ -71,7 +71,7 @@ abstract class BaseRepository implements IBase, ICriteria
     
     protected function getModelClass()
     {
-        if(!method_exists($this, 'model')){
+        if (!method_exists($this, 'model')) {
             throw new ModelNotDefinedException("Not Model Defined");
         }
         return app()->make($this->model());

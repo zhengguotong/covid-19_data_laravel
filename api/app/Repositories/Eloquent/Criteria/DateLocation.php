@@ -6,7 +6,10 @@ use App\Repositories\Criteria\ICriterion;
 
 class DateLocation implements ICriterion
 {
-    protected $report_date, $region, $province, $admin2;
+    protected $report_date;
+    protected $region;
+    protected $province;
+    protected $admin2;
 
     public function __construct($report_date, $region, $province, $admin2)
     {

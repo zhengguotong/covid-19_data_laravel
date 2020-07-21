@@ -20,14 +20,14 @@ class ProfileJsonResponse
         $response = $next($request);
 
         //check if debugbar is enabled
-        if(! app()->bound('debugbar') || ! app('debugbar')->isEnabled()){
+        if (! app()->bound('debugbar') || ! app('debugbar')->isEnabled()) {
             return $response;
         }
 
      
         //profile the json response
-        if($response instanceof JsonResponse && $request->has('_debug')){
-           $response->setData(array_merge($response->getData(true), [
+        if ($response instanceof JsonResponse && $request->has('_debug')) {
+            $response->setData(array_merge($response->getData(true), [
                '_debug' => Arr::only(app('debugbar')->getData(), 'queries')
            ]));
         }
